@@ -1,0 +1,47 @@
+.save-message {
+    display: none;
+    animation: fadeInAnimation ease 1s;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    padding: 15px;
+    padding-left: 80px;
+    padding-right: 80px;
+    color: white;
+    background-color: #01b101bb;
+    border-radius: 3px;
+  }
+  .delete-message {
+    display: none;
+    animation: fadeInAnimation ease 1s;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    padding: 15px;
+    padding-left: 80px;
+    padding-right: 80px;
+    color: white;
+    background-color: #b10101bb;
+    border-radius: 3px;
+  }
+  @keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+        bottom: -45px
+    }
+    100% {
+        opacity: 1;
+        bottom: 15px;
+     }
+  }
+  @keyframes fadeOutAnimation {
+    0% {
+        opacity: 1;
+        bottom: 15px
+    }
+    100% {
+        opacity: 1;
+        bottom: -60px;
+        display: none;
+     }
+  }

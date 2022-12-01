@@ -1,0 +1,24 @@
+<form method="post">
+    <div class="container-news">
+        <label for="eheader">Header: </label>
+        <input name="eheader" value="{{HEADER}}"> <br>
+        <label for="esubtitle">Subtitle: </label>
+        <input name="esubtitle" value="{{SUBTITLE}}"> <br>
+        <label for="etargetpage">Targetpage: </label>
+        <input name="etargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" value="{{TARGETPAGE}}"> <br>
+        <label for="estartdate">Startdate: </label>
+        <input name="estartdate" value="{{STARTDATE}}"> <br>
+        <label for="eenddate">Enddate: </label>
+        <input name="eenddate" value="{{ENDDATE}}"> <br>
+        <label for="enews">News: </label>
+        <textarea name="enews" maxlength="500">{{NEWS}}</textarea> <br>
+        <label for="egroup">Group: </label>
+        <input name="egroup" pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$" value="{{GROUP}}"> <br>
+        <label for="eauthor">Author: </label>
+        <input name="eauthor" value="{{AUTHOR}}"> <br>
+        <label for="enewsid">News_ID: </label>
+        <input name="enewsid" value="{{NEWSID}}" readonly> <br>
+        <input type="submit" value="Save" name="savesubmit">
+        <input type="submit" value="Delete" name="deletesubmit">
+    </div> <br>
+</form>

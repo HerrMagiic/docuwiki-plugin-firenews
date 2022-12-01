@@ -1,0 +1,30 @@
+.container-news {
+    display: block;
+    word-wrap: break-word;
+    width: 220px;
+    border-bottom: 1px solid black;
+    padding: 5px;
+    border-radius: 3px;
+    margin-left: auto; 
+    margin-right: 0;
+}
+.header {
+    font-size: 15px;
+    font-style: inherit;
+    font-weight: bold;
+    text-decoration: underline;
+    color: rgb(8, 45, 176);
+}
+.subtitle {
+    font-size: 14px;
+}
+.date-author {
+    font-size: 12px;
+}
+.news {
+    margin: 0;
+    font-size: 12px;
+}
+.div-news {
+    margin-top: 4px;
+}
