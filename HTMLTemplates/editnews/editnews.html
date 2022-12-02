@@ -1,24 +1,24 @@
 <form method="post">
     <div class="container-news">
-        <label for="eheader">Header: </label>
+        <label for="eheader">{{firenews_author_header}}: </label>
         <input name="eheader" value="{{HEADER}}"> <br>
-        <label for="esubtitle">Subtitle: </label>
+        <label for="esubtitle">{{firenews_author_subtitle}}: </label>
         <input name="esubtitle" value="{{SUBTITLE}}"> <br>
-        <label for="etargetpage">Targetpage: </label>
+        <label for="etargetpage">{{firenews_author_targetpage}}: </label>
         <input name="etargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" value="{{TARGETPAGE}}"> <br>
-        <label for="estartdate">Startdate: </label>
+        <label for="estartdate">{{firenews_author_startdate}}: </label>
         <input name="estartdate" value="{{STARTDATE}}"> <br>
-        <label for="eenddate">Enddate: </label>
+        <label for="eenddate">{{firenews_author_enddate}}: </label>
         <input name="eenddate" value="{{ENDDATE}}"> <br>
-        <label for="enews">News: </label>
+        <label for="enews">{{firenews_author_news}}: </label>
         <textarea name="enews" maxlength="500">{{NEWS}}</textarea> <br>
-        <label for="egroup">Group: </label>
+        <label for="egroup">{{firenews_author_group}}: </label>
         <input name="egroup" pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$" value="{{GROUP}}"> <br>
-        <label for="eauthor">Author: </label>
+        <label for="eauthor">{{firenews_author_author}}: </label>
         <input name="eauthor" value="{{AUTHOR}}"> <br>
         <label for="enewsid">News_ID: </label>
         <input name="enewsid" value="{{NEWSID}}" readonly> <br>
-        <input type="submit" value="Save" name="savesubmit">
-        <input type="submit" value="Delete" name="deletesubmit">
+        <input type="submit" value="{{firenews_editnews_save}}" name="savesubmit">
+        <input type="submit" value="{{firenews_editnews_delete}}" name="deletesubmit">
     </div> <br>
 </form>

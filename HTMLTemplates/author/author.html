@@ -1,72 +1,71 @@
 <div class="container">
     <div class="container-template">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-        <script type="text/javascript" src="./lib/plugins/firenews/templates/author/author.js"></script>
+        <script type="text/javascript" src="./lib/plugins/firenews/HTMLTemplates/author/author.js"></script>
     
-        <link href="./lib/plugins/firenews/templates/author/author.css" type="text/css" rel="stylesheet" />
+        <link href="./lib/plugins/firenews/HTMLTemplates/author/author.css" type="text/css" rel="stylesheet" />
     
         <form class="form-createnews" onsubmit="onSubmitForm()" method="post">
             <h1 class="header-news">News</h1>
             <br>
             <div class="div-header">
-                <label for="fheader">Überschrift: <font color="red">*</font></label> <br>
+                <label for="fheader">{{firenews_author_header}}: <font color="red">*</font></label> <br>
                 <input type="text" id="fheader" class="lheader" onkeyup="HeaderChange()" name="fheader" placeholder="..." required>
             </div>
             
             <div class="div-subtitle">
-                <label for="lsubtitle">Untertitel: </label> <br>
+                <label for="lsubtitle">{{firenews_author_subtitle}}: </label> <br>
                 <input type="text" id="lsubtitle" class="lsubtitle" onkeyup="SubtitleChange()" name="lsubtitle" placeholder="...">
             </div>
             
             <div class="div-targetpage">
-                <label for="ltargetpage">Ziel Seite: <font color="red">*</font></label> 
+                <label for="ltargetpage">{{firenews_author_targetpage}}: <font color="red">*</font></label> 
                 <div class="tooltip">
                     <img id="target-icon" class="icon-info" src="/lib/images/info.png">
                     <span class="tooltiptext">
-                        Die Zielseite erkennt man in der URL: <br>
-                        https://website.de/doku.php?id=<font color="black">brand:allgemein:start</font>
+                        {{firenews_author_targetpage_tp}}
                     </span>
                 </div>
                 <br>
-                <input type="text" id="ltargetpage" name="ltargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" placeholder="allgemein:start" required>
+                <input type="text" id="ltargetpage" name="ltargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" placeholder="{{firenews_author_targetpage_ph}}" required>
             </div>
             
             <div class="container-dates">
                 <div class="div-startdate">
-                    <label for="lstartdate">veröffentlicht am: <font color="red">*</font></label> <br>
+                    <label for="lstartdate">{{firenews_author_startdate}}: <font color="red">*</font></label> <br>
                     <input type="date" class="lstartdate" onkeyup="DateAuthorChange()" id="lstartdate" name="lstartdate" required>
                 </div>
                 <div class="div-endate">
-                    <label for="lenddate">abgelaufen am: <font color="red">*</font></label> <br>
+                    <label for="lenddate">{{firenews_author_enddate}}: <font color="red">*</font></label> <br>
                     <input type="date" class="lenddate" id="lenddate" name="lenddate" required>
                 </div>
             </div>
             
             <div class="div-news">
-                <label class="lnews" for="lnews">Deine Neuigkeit: <font color="red">*</font></label> 
+                <label class="lnews" for="lnews">{{firenews_author_news}}: <font color="red">*</font></label> 
                 <div class="tooltip">
                     <img id="target-icon" class="icon-info" src="/lib/images/info.png">
-                    <span class="tooltiptext">Tooltip text</span>
+                    <span class="tooltiptext">{{firenews_author_news_tp}}</span>
                 </div> <br>
                 <div class="text-options">
                     <img src="/lib/images/toolbar/bold.png" id="bold" onclick="addBold()">
                     <img src="/lib/images/toolbar/italic.png" id="italic" onclick="addItalic()">
                     <img src="/lib/images/toolbar/underline.png" id="underline" onclick="addUnderline()">
                 </div>
-                <textarea id="lnews" class="textlnews" onkeyup="NewsChange()" name="lnews" placeholder="Deine neuigkeit ..." maxlength="500"></textarea>
+                <textarea id="lnews" class="textlnews" onkeyup="NewsChange()" name="lnews" placeholder="{{firenews_author_news_ph}}" maxlength="500"></textarea>
             </div>
             
             <div class="div-group">
-                <label for="lgroup">Welche Gruppe kann sehen: </label>
+                <label for="lgroup">{{firenews_author_group}}: </label>
                 <div class="tooltip">
                     <img id="target-icon" class="icon-info" src="/lib/images/info.png">
-                    <span class="tooltiptext">Tooltip text</span>
+                    <span class="tooltiptext">{{firenews_author_group_tp}}</span>
                 </div> <br>
-                <input type="text" id="lgroup" name="lgroup" placeholder="brand,admin,..." pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$">
+                <input type="text" id="lgroup" name="lgroup" placeholder="{{firenews_author_group_ph}}" pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$">
             </div>
             
             <div class="div-sendmails">
-                <label for="lsendEmails">Zu ausgewählten gruppe email senden: </label>
+                <label for="lsendEmails">{{firenews_author_sendgroup}}: </label>
                 <label class="container-checkbox">
                     <input type="checkbox" name="lsendEmails">
                     <span class="checkmark"></span>
@@ -74,18 +73,18 @@
             </div>
             
             <div class="div-author">
-                <label for="lauthor">Author: </label> <br>
+                <label for="lauthor">{{firenews_author_author}}: </label> <br>
                 <input type="text" class="lauthor" onkeyup="DateAuthorChange()" id="lauthor" name="lauthor" value="{{author}}">
             </div>
             <br>
-            <input type="submit" value="Veröffentlichen" class="submitButton" name="submitted">
+            <input type="submit" value="{{firenews_author_submit}}" class="submitButton" name="submitted">
         </form>
     
         {{ script_placeholder }}
     </div>
     <div class="container-newsPreview">
-        <link href="./lib/plugins/firenews/templates/news/news.css" type="text/css" rel="stylesheet" />
-        <h1 class="preview">Vorschau</h1>
+        <link href="./lib/plugins/firenews/HTMLTemplates/news/news.css" type="text/css" rel="stylesheet" />
+        <h1 class="preview">{{firenews_author_preview}}</h1>
         <div class="container-news">
             <a class="header"></a> <br>
             <a class="subtitle"></a> <br>
@@ -97,8 +96,8 @@
     </div>
 </div>
 <div class="info-message">
-    <a class="info-message-message">News erstellt!</a>
+    <a class="info-message-message">{{firenews_author_message_info}}</a>
 </div>
 <div class="error-message">
-    <a class="error-message-message"></a>
+    <a class="error-message-message">{{firenews_author_message_error}}</a>
 </div>

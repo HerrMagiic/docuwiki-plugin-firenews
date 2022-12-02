@@ -18,7 +18,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     /** @inheritDoc */
     public function connectTo($mode)
     {
-        $this->Lexer->addSpecialPattern('\{\{ninews>[^}]*\}\}', $mode, 'plugin_firenews');
+        $this->Lexer->addSpecialPattern('\{\{firenews>[^}]*\}\}', $mode, 'plugin_firenews');
     }
 
     /** @inheritDoc */
@@ -30,10 +30,11 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         // saves the string into $params
         $params = $match[1];
 
-        // add the found string into an array with the key param
+        // add the found string into an array with the key 'param'
         $datatest_conf              = array();
         $datatest_conf['param']     = $params;
 
+        // I think this is useless 
         if (!$params) {
             msg('Syntax detected but unknown parameter was attached.', -1);
         } else {
@@ -47,10 +48,11 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     {
         // Variables
         global $USERINFO, $conf;
+        
         $pluginname = "firenews";
-        $tablename = "firenews";
+        $tablename = $pluginname;
 
-        //connect to database with sqlite plugin
+        // Connect to database with sqlite plugin
         $sqlite = $this->sqlConnection($pluginname);
 
         // Create table if not exists
@@ -70,11 +72,13 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
 
         // Checks if mode is xhtml
         if ($mode === 'xhtml') {
-            // When param matches creates the template on the page
+            // When param matches creates the Author template on the page
             if ($data['param'] === "author") {
 
-                // gets the html file that will get added to the page
-                $formView = file_get_contents(__DIR__ . "/templates/author/author.html");
+                // Gets the html file that will get added to the page
+                $formView = file_get_contents(__DIR__ . "/HTMLTemplates/author/author.html");
+                // Applies the correct language from the lang/language
+                $formView = $this->setLanguage($formView, "/\{\{firenews\_(\w+)\}\}/");
 
                 // replaces the {{author}} tag with the current user name
                 $formView = str_replace("{{author}}", "{$USERINFO['name']}", $formView);
@@ -82,23 +86,30 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // if the form is submitted
                 if (isset($_POST["submitted"])) {
 
-                    // Adds a {{ninews>}} tag to the targetpage if not exists
+                    /**
+                     * Adds a {{firenews>}} tag to the targetpage if not exists
+                     * And adds the submitted information in the database
+                     */
+
+                    // Explodes the string to get the targetpage Path
                     $pagelocation = explode(':', $_POST['ltargetpage']);
                     $pagepath = __DIR__ . "\..\..\..\data\pages";
                     foreach ($pagelocation as $value) {
                         $pagepath .= "\\" . $value;
                     }
                     $pagepath .= ".txt";
-                    // If file not exists return false and add a error message
+
+                    // If file don't exists return false and add a error message
                     if (!file_exists($pagepath)) {
                         $formView = str_replace("{{ script_placeholder }}", 
                         <<<HTML
                         <script>
-                            // This will trigger the error message see author.js
+                            // This will trigger the error message see HTMLTempalte/author/author.js
                             window.location = window.location.href + "&fileexists=false";
                         </script>
                         HTML, $formView);
 
+                        // This adds the html to the page
                         $renderer->doc .= $formView;
                         return false;
                     } 
@@ -106,8 +117,9 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     // NOCACHE needed so everyting gets updates correctly
                     // ToDo find a way to line break
                     $nocacheTag = "~~NOCACHE~~";
-                    $insertAnchor = "{{ninews>{$_POST['ltargetpage']}}}";
+                    $insertAnchor = "{{firenews>{$_POST['ltargetpage']}}}";
 
+                    // Writes the tag into the targetpage
                     $fileStream = fopen($pagepath, 'a');
                     if (!strpos(file_get_contents($pagepath), $insertAnchor)) {
                         fwrite($fileStream, $nocacheTag.$insertAnchor);
@@ -144,19 +156,25 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 
                 // this will add the html to the page
                 $renderer->doc .= $formView;
-
                 return true;
+
             } else if ($data['param'] === "editnews") {
 
-                $editnewsTemplate = file_get_contents(__DIR__ . "/templates/editnews/editnewsTemplate.html");
-                $editnews = file_get_contents(__DIR__ . "/templates/editnews/editnews.html");
-                $outputRender = "";
-                // if the form is submitted
-                if (isset($_POST['savesubmit'])) {
+                // Creating the edit news Page
+                $editnewsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/editnews/editnewsTemplate.html");
+                // Applies the correct language from the lang/language
+                $editnewsTemplate = $this->setLanguage($editnewsTemplate, "/\{\{firenews\_(\w+)\}\}/");
 
+                $editnews = file_get_contents(__DIR__ . "/HTMLTemplates/editnews/editnews.html");
+                // Applies the correct language from the lang/language
+                $editnews = $this->setLanguage($editnews, "/\{\{firenews\_(\w+)\}\}/");
+                
+                $outputRender = "";
+                // if the form is submitted on save 
+                if (isset($_POST['savesubmit'])) {
+                    // Update database
                     $sqlite->query("UPDATE {$tablename} 
-                                        SET 
-                                            header = '{$_POST['eheader']}',
+                                        SET header = '{$_POST['eheader']}',
                                             subtitle = '{$_POST['esubtitle']}',
                                             targetpage = '{$_POST['etargetpage']}',
                                             startdate = '{$_POST['estartdate']}',
@@ -164,7 +182,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                                             'news' = '{$_POST['enews']}',
                                             'group' = '{$_POST['egroup']}',
                                             author = '{$_POST['eauthor']}'
-                                        WHERE news_id = {$_POST['enewsid']}"
+                                            WHERE news_id = {$_POST['enewsid']}"
                                     );
                     // Resets the POST request to GET
                     $editnewsTemplate = str_replace("{{ script_placeholder }}", 
@@ -175,6 +193,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     </script>
                     HTML, $editnewsTemplate);
                 }
+                // if the from is submitted on delete
                 if (isset($_POST["deletesubmit"])) {
                     $sqlite->query("DELETE FROM {$tablename}
                                         WHERE news_id = {$_POST['enewsid']}"
@@ -187,13 +206,14 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                         window.location = window.location.href + "&submitted=deleted";
                     </script>
                     HTML, $editnewsTemplate);
-                    
                 }
-                
+
                 // Gets the news with the right page
                 $result = $sqlite->query("SELECT * FROM {$tablename} ORDER BY news_id DESC");
 
+                
                 if ($result != NULL || $result != false) {
+                    // Goes through the results and adds them to $outputRender
                     foreach ($result as $value) {
                         $outputRender .= str_replace(
                             array("{{HEADER}}", "{{SUBTITLE}}", "{{TARGETPAGE}}", "{{STARTDATE}}", "{{ENDDATE}}", "{{NEWS}}", "{{GROUP}}", "{{AUTHOR}}", "{{NEWSID}}"),
@@ -202,12 +222,18 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                         );
                     }
                 }
-                
+                // Replaces the news tag with the outputRender
                 $formView = str_replace("{{NEWS}}", $outputRender, $editnewsTemplate);
+
+                // Appens the html to the page
                 $renderer->doc .= $formView;
                 return true;
-
             }
+
+            /**
+             * This part adds the news to the right page
+             */
+
             // Gets the news with the right page
             $result = $sqlite->query("SELECT * FROM {$tablename} 
                                         WHERE 
@@ -221,7 +247,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
             // If the page is found create the news
             if ($result != NULL || $result != false) {
                 // Gets the news template
-                $newsTemplate = file_get_contents(__DIR__ . "/templates/news/news.html");
+                $newsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/news/news.html");
+
                 $outputRender = "";
                 // adds news to the page that was returned by the database
                 foreach ($result as $value) {
@@ -238,7 +265,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                             array("{$value['header']}", "{$value['subtitle']}", "{$value['startdate']}, {$value['author']}", "{$value['news']}"),
                             $newsTemplate
                         );
-                        
+
                         continue;
                     }
 
@@ -249,6 +276,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                         $newsTemplate
                     );
                 }
+                // Puts the html to the page
                 $renderer->doc .= $outputRender;
                 
                 return true;
@@ -286,25 +314,32 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
 
     /**
      * Gets user from groups
-     * @param mixed $groups Groups from $_POST['lgroup']
+     * @param string $groups Groups from $_POST['lgroup']
      * 
      * @return [array] array of emails
      */
-    private function getUsersEmailsOfaGroup($groups)
+    private function getUsersEmailsOfaGroup(string $groups): array
     {
+        // Explodes the group string
         $groupArr = explode(",", $groups);
+        // Gets the user.auth.php where all groups are in (maybe there is a better way)
         $filestream = fopen(__DIR__ . "\..\..\..\conf\users.auth.php", 'r');
         $listOfEmails = [];
-
+        
+        // Goes through the file
         while (feof($filestream)) {
 
             $currentLine = fgets($filestream);
+            // We want to ignore comments
             if (str_starts_with($currentLine, "# ")) {
                 continue;
             }
+            // We want to ignore empty lines
             if (strlen($currentLine) < 20) {
                 continue;
             }
+            // Maybe here are more possible errors that could happen
+
             $explodeFile = explode(":", $currentLine);
             $emailOfUser = $explodeFile[3];
             $groupsOfUser = array_slice($explodeFile, 3);
@@ -338,11 +373,11 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     
     /**
      * Checks if the user is in one of those groups
-     * @param mixed $groups
+     * @param string $groups
      * 
      * @return [bool]
      */
-    private function isInGroup($groups) {
+    private function isInGroup(string $groups): bool {
         global $INFO;
         $groupArr = explode(",", $groups);
 
@@ -354,5 +389,27 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         }
 
         return false;
+    }
+
+    
+    /**
+     * This function will search through the given file
+     * and replaces found language tags with the language in the file
+     * 
+     * @param string $file string that should get the replacements
+     * @param string $pattern regex pattern to search for
+     * 
+     * @return string with the right language
+     */
+    private function setLanguage(string $file, string $pattern): string {
+        
+        $result = preg_replace_callback($pattern, 
+                function($matches) { 
+                    $langTag = str_replace(["{{", "}}"], "", $matches[0]);
+                    $lang = $this->getLang($langTag);
+                    return $lang;
+                },
+                $file );
+        return $result;
     }
 }

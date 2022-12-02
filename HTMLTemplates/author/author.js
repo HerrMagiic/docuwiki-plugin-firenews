@@ -38,7 +38,6 @@ $(document).ready(function () {
 });
 async function pageMissing() {
     $('.error-message')[0].style.display = "block";
-    $('.error-message-message')[0].innerHTML = "Seite existiert nicht!";
     await new Promise(r => setTimeout(r, 4000));
     $('.error-message')[0].style.animation = "fadeOutAnimation 1s";
     await new Promise(r => setTimeout(r, 1000));
@@ -52,7 +51,6 @@ async function pageMissing() {
  */
 async function createInfoMessage() {
     $('.info-message')[0].style.display = "block";
-    $('.info-message')[0].style.backgroundColor = "#01b101bb";
     await new Promise(r => setTimeout(r, 4000));
     $('.info-message')[0].style.animation = "fadeOutAnimation 1s";
     await new Promise(r => setTimeout(r, 1000));
