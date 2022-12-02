@@ -1,7 +1,7 @@
 base   firenews
 author Nils Schucka
 email  nils@schucka.de
-date   2022-11-09
+date   2022-12-02
 name   firenews
 desc   Creates news
 url    https://www.orizon-surf.de/
