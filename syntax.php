@@ -220,6 +220,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                             array("{$value['header']}", "{$value['subtitle']}", "{$value['targetpage']}", "{$value['startdate']}", "{$value['enddate']}", "{$value['news']}", "{$value['group']}", "{$value['author']}", "{$value['news_id']}"),
                             $editnews
                         );
+                        
                     }
                 }
                 // Replaces the news tag with the outputRender
@@ -379,7 +380,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
      */
     private function isInGroup(string $groups): bool {
         global $INFO;
-        $groupArr = explode(",", $groups);
+        $groupArr[] = explode(",", $groups);
 
         // Ignores everything if the user is a admin or manager
         if($INFO['isadmin'] || $INFO['ismanager'] ) { return true; }
