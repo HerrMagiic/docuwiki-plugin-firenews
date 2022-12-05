@@ -62,6 +62,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     'header' TEXT NOT NULL,
                     'subtitle' TEXT NOT NULL,
                     'targetpage' TEXT NOT NULL,
+                    'referencelink' TEXT NOT NULL,
                     'startdate' DATE NOT NULL,
                     'enddate' DATE NOT NULL,
                     'news' TEXT NOT NULL,
@@ -82,6 +83,14 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
 
                 // replaces the {{author}} tag with the current user name
                 $formView = str_replace("{{author}}", "{$USERINFO['name']}", $formView);
+
+                $pagearr = array('test', 'start', 'allnews');
+                $displayedPages = "";
+                foreach ($pagearr as $key => $value) {
+                    // Gets the html file that will get added to the page
+                    $templatePages = file_get_contents(__DIR__ . "/HTMLTemplates/author/pageandgroupbtn.html");
+                    $displayedPages .= str_replace("{{pageandgroup}}", 'l'.$value, $templatePages);
+                }
 
                 // if the form is submitted
                 if (isset($_POST["submitted"])) {
