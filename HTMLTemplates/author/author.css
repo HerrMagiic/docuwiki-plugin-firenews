@@ -58,24 +58,25 @@ input[type=submit]:hover {
 
 
 /* Customize the label (the container) */
-.container-checkbox {
-  display: block;
+.checkbox-label {
+  display: flex;
+  /* display: block;
   position: relative;
   margin-top: 4px;
   padding-left: 35px;
-  margin-bottom: 12px;
+  margin-bottom: 12px; */
   cursor: pointer;
   font-size: 22px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  padding-bottom: 10px;
+  /* padding-bottom: 10px; */
 }
 
 /* Hide the browser's default checkbox */
-.container-checkbox input {
-  position: absolute;
+.checkbox-label input {
+  /* position: absolute; */
   opacity: 0;
   cursor: pointer;
   height: 0;
@@ -84,9 +85,8 @@ input[type=submit]:hover {
 
 /* Create a custom checkbox */
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: block;
+  position: relative;
   height: 25px;
   width: 25px;
   border-radius: 1px;
@@ -94,12 +94,12 @@ input[type=submit]:hover {
 }
 
 /* On mouse-over, add a grey background color */
-.container-checkbox:hover input ~ .checkmark {
+.checkbox-label:hover input ~ .checkmark {
   background-color: rgb(133, 133, 133);
 }
 
 /* When the checkbox is checked, add a blue background */
-.container-checkbox input:checked ~ .checkmark {
+.checkbox-label input:checked ~ .checkmark {
   background-color: #2196F3;
 }
 
@@ -111,12 +111,12 @@ input[type=submit]:hover {
 }
 
 /* Show the checkmark when checked */
-.container-checkbox input:checked ~ .checkmark:after {
+.checkbox-label input:checked ~ .checkmark:after {
   display: block;
 }
 
 /* Style the checkmark/indicator */
-.container-checkbox .checkmark:after {
+.checkbox-label .checkmark:after {
   left: 9px;
   top: 5px;
   width: 5px;
@@ -126,6 +126,10 @@ input[type=submit]:hover {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+.container-checkbox {
+  margin-top: 5px;
+  width: fit-content;
 }
 
 .tooltip {
@@ -222,20 +226,24 @@ input[type=submit]:hover {
 .container-pageandgroup {
   display: block;
   text-align: center;
-
+  
+  margin-right: 14px;
   
 }
 .pagegroupname {
-    display: block;
-    font-weight: bold;
-    text-align: center;
-    line-height: 150%;
-    font-size: .85em;
+  display: block;
+  font-weight: bold;
+  text-align: center;
+  line-height: 150%;
+  font-size: 14px;
 }
 .pagegroup {
-  left: 46%;
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 .targets {
   display: flex;
+  margin: 5px;
   margin-right: 5px;
 }

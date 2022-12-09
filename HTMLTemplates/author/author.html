@@ -20,20 +20,21 @@
             
             <div class="div-targetpage">
                 <label for="ltargetpage">{{firenews_author_targetpage}}: <font color="red">*</font></label> 
-                <!-- <div class="tooltip">
+                 <div class="tooltip">
                     <img id="target-icon" class="icon-info" src="/lib/images/info.png">
                     <span class="tooltiptext">
                         {{firenews_author_targetpage_tp}}
                     </span>
                 </div>
-                <br>
+                <!--<br>
                 <input type="text" id="ltargetpage" name="ltargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" placeholder="{{firenews_author_targetpage_ph}}" required> -->
                 <div class="targets">
                     {{GROUP-ELEMENT}}
                 </div>
             </div>
             <div class="div-reference">
-
+                <label for="lreferenz">{{firenews_author_reference}}: </label> <br>
+                <input type="text" id="lreferenz" class="lreferenz" name="lreferenz" placeholder="">
             </div>
             
             <div class="container-dates">
@@ -72,10 +73,12 @@
             
             <div class="div-sendmails">
                 <label for="lsendEmails">{{firenews_author_sendgroup}}: </label>
-                <label class="container-checkbox">
-                    <input type="checkbox" name="lsendEmails">
-                    <span class="checkmark"></span>
-                </label>
+                <div class="container-checkbox">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="lsendEmails">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
             </div>
             
             <div class="div-author">

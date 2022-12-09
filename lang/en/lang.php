@@ -9,8 +9,9 @@
 $lang['firenews_author_header']             = 'Header';
 $lang['firenews_author_subtitle']           = 'Subtitle';
 $lang['firenews_author_targetpage']         = 'Target Page';
-$lang['firenews_author_targetpage_tp']      = 'You can find the target page in the URL: <br>https://website.de/doku.php?id=<font color="black">start:overall:start</font>';
-$lang['firenews_author_targetpage_ph']      = 'start:overall:...';
+$lang['firenews_author_targetpage_tp']      = 'You can add more tagetpages in the plugin settings';
+// $lang['firenews_author_targetpage_ph']      = 'start:overall:...';
+$lang['firenews_author_reference']          = 'Referenz-Link';
 $lang['firenews_author_startdate']          = 'publish on';
 $lang['firenews_author_enddate']            = 'End date';
 $lang['firenews_author_news']               = 'Your news';

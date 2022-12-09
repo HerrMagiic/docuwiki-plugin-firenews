@@ -9,8 +9,9 @@
 $lang['firenews_author_header']             = 'Überschrift';
 $lang['firenews_author_subtitle']           = 'Untertitel';
 $lang['firenews_author_targetpage']         = 'Ziel Seite';
-$lang['firenews_author_targetpage_tp']      = 'Die Zielseite erkennt man in der URL: <br>https://website.de/doku.php?id=<font color="black">brand:allgemein:start</font>';
-$lang['firenews_author_targetpage_ph']      = 'allgemein:start';
+$lang['firenews_author_targetpage_tp']      = 'Man kann mehr seiten zum anklicken in den Plugin Einstellungen einstellen!';
+// $lang['firenews_author_targetpage_ph']      = 'allgemein:start';
+$lang['firenews_author_reference']          = 'Referenz-Link';
 $lang['firenews_author_startdate']          = 'veröffentlicht am';
 $lang['firenews_author_enddate']            = 'abgelaufen am';
 $lang['firenews_author_news']               = 'Deine Neuigkeit';
@@ -33,4 +34,5 @@ $lang['firenews_editnews_header']           = 'News bearbeiten';
 $lang['firenews_editnews_message_save']     = 'News gespeichert!';
 $lang['firenews_editnews_message_delete']   = 'News gelöscht!';
 
-
+//Config
+$lang['targetpages']                        = 'test message yeah';

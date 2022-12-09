@@ -84,13 +84,29 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // replaces the {{author}} tag with the current user name
                 $formView = str_replace("{{author}}", "{$USERINFO['name']}", $formView);
 
-                $pagearr = array('test', 'start', 'allnews');
+                /////////////////////
+                /// Page elements ///
+                /////////////////////
+                // get pages from conf
+                $pagesArr = $this->getPagesFromConf();
+
+                // Adds pages to the html file
                 $displayedPages = "";
-                foreach ($pagearr as $key => $value) {
+                foreach ($pagesArr as $key => $value) {
                     // Gets the html file that will get added to the page
                     $templatePages = file_get_contents(__DIR__ . "/HTMLTemplates/author/pageandgroupbtn.html");
-                    $displayedPages .= str_replace("{{pageandgroup}}", 'l'.$value, $templatePages);
+                    $templatePages = str_replace("{{pageandgroup}}", 'lpage-'.$value, $templatePages);
+                    $templatePages = str_replace("{{pageandgroup-value}}", $value, $templatePages);
+                    $displayedPages .= $templatePages;
                 }
+                // replaces the {{GROUP-ELEMENT}} tag with the current user name
+                $formView = str_replace("{{GROUP-ELEMENT}}", $displayedPages, $formView);
+
+                //////////////////////
+                /// Group elements ///
+                //////////////////////
+
+
 
                 // if the form is submitted
                 if (isset($_POST["submitted"])) {
@@ -99,44 +115,37 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                      * Adds a {{firenews>}} tag to the targetpage if not exists
                      * And adds the submitted information in the database
                      */
-
                     // Explodes the string to get the targetpage Path
-                    $pagelocation = explode(':', $_POST['ltargetpage']);
-                    $pagepath = __DIR__ . "\..\..\..\data\pages";
-                    foreach ($pagelocation as $value) {
-                        $pagepath .= "\\" . $value;
-                    }
-                    $pagepath .= ".txt";
-
+                    $pagePaths = $this->returnPagePaths($pagesArr);
+                    
                     // If file don't exists return false and add a error message
-                    if (!file_exists($pagepath)) {
-                        $formView = str_replace("{{ script_placeholder }}", 
-                        <<<HTML
-                        <script>
-                            // This will trigger the error message see HTMLTempalte/author/author.js
-                            window.location = window.location.href + "&fileexists=false";
-                        </script>
-                        HTML, $formView);
-
-                        // This adds the html to the page
-                        $renderer->doc .= $formView;
-                        return false;
-                    } 
+                    foreach ($pagePaths as $key => $value) {
+                        if (!file_exists($value)) {
+                            $formView = str_replace("{{ script_placeholder }}", 
+                            <<<HTML
+                            <script>
+                                // This will trigger the error message see HTMLTempalte/author/author.js
+                                window.location = window.location.href + "&fileexists=false";
+                            </script>
+                            HTML, $formView);
+    
+                            // This adds the html to the page
+                            $renderer->doc .= $formView;
+                            return false;
+                        } 
+                    }
 
                     // NOCACHE needed so everyting gets updates correctly
                     // ToDo find a way to line break
-                    $nocacheTag = "~~NOCACHE~~";
-                    $insertAnchor = "{{firenews>{$_POST['ltargetpage']}}}";
-
-                    // Writes the tag into the targetpage
-                    $fileStream = fopen($pagepath, 'a');
-                    if (!strpos(file_get_contents($pagepath), $insertAnchor)) {
-                        fwrite($fileStream, $nocacheTag.$insertAnchor);
+                    foreach ($pagePaths as $key => $value) {
+                        $pagename = str_replace(".txt", "", end(explode("\\", $value)));
+                        $this->writeToPage($value, "{{firenews>{$pagename}}}", true);
                     }
-
+                    $pages = $this->getPages();
+                    $groups = $this->getGroups();
                     // Send form to database
                     $sqlite->query("INSERT INTO $tablename ('header', 'subtitle', 'targetpage', 'startdate', 'enddate', 'news', 'group', 'author') 
-                        VALUES ('{$_POST['fheader']}', '{$_POST['lsubtitle']}', '{$_POST['ltargetpage']}', '{$_POST['lstartdate']}', '{$_POST['lenddate']}', '{$_POST['lnews']}', '{$_POST['lgroup']}', '{$_POST['lauthor']}')");
+                        VALUES ('{$_POST['fheader']}', '{$_POST['lsubtitle']}', '{$pages}', '{$_POST['lstartdate']}', '{$_POST['lenddate']}', '{$_POST['lnews']}', '{$_POST['lgroup']}', '{$_POST['lauthor']}')");
 
                     /**
                      * Send emails to group members if selected
@@ -229,7 +238,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                             array("{$value['header']}", "{$value['subtitle']}", "{$value['targetpage']}", "{$value['startdate']}", "{$value['enddate']}", "{$value['news']}", "{$value['group']}", "{$value['author']}", "{$value['news_id']}"),
                             $editnews
                         );
-                        
                     }
                 }
                 // Replaces the news tag with the outputRender
@@ -240,16 +248,19 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 return true;
             }
 
-            /**
-             * This part adds the news to the right page
-             */
+            /////////////////////////////////////////////////
+            /// This part adds the news to the right page ///
+            /////////////////////////////////////////////////
 
             // Gets the news with the right page
-            $result = $sqlite->query("SELECT * FROM {$tablename} 
+            $result = $sqlite->query("SELECT * FROM {$tablename}
                                         WHERE 
-                                            targetpage = '{$data['param']}' AND
                                             startdate <= strftime('%Y-%m-%d','now') AND
-                                            enddate >= strftime('%Y-%m-%d','now')
+                                            enddate >= strftime('%Y-%m-%d','now') AND
+                                            targetpage = '{$data['param']}' OR
+                                            targetpage LIKE '%,{$data['param']}' OR
+                                            targetpage LIKE '%,{$data['param']},%' OR
+                                            targetpage LIKE '{$data['param']},%'
                                             ORDER BY news_id DESC
                                             LIMIT 5
                                     ");
@@ -371,7 +382,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
      * 
      * @return [void]
      */
-    private function sendMailToUsers(array $emails) {
+    private function sendMailToUsers(array $emails) 
+    {
         /** @var helper_plugin_smtp $sqlite */
         $mail = new Mailer();
         $mail->setHeader("nice Header","value", true);
@@ -387,7 +399,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
      * 
      * @return [bool]
      */
-    private function isInGroup(string $groups): bool {
+    private function isInGroup(string $groups): bool 
+    {
         global $INFO;
         $groupArr[] = explode(",", $groups);
 
@@ -411,7 +424,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
      * 
      * @return string with the right language
      */
-    private function setLanguage(string $file, string $pattern): string {
+    private function setLanguage(string $file, string $pattern): string 
+    {
         
         $result = preg_replace_callback($pattern, 
                 function($matches) { 
@@ -421,5 +435,109 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 },
                 $file );
         return $result;
+    }
+
+    /**
+     * Writes firenews anchor into a page
+     * @param string $path example the path
+     * @param string $input that what should be writen
+     * @param bool $nocache if the nocache tag should be added
+     */
+    private function writeToPage(string $path, string $input, bool $nocache) 
+    {
+        echo $path;
+        // Writes the tag into the targetpage
+        $fileStream = fopen($path, 'a');
+
+        if (!strpos(file_get_contents($path), $input)) {
+            if($nocache && !strpos(file_get_contents($path), "~~NOCACHE~~")) {
+                fwrite($fileStream, "~~NOCACHE~~\\\\".$input);
+            } else {
+                fwrite($fileStream, $input);
+            }
+            
+        }
+    }
+
+    /**
+     * Returns an string array of path for the pages
+     * 
+     * @param array<string> $pages
+     * 
+     * @return array
+     */
+    private function returnPagePaths(array $pages): array
+    {
+        $result = array();
+        foreach ($pages as $key => $value) {
+            $pagelocation = explode(':', $value);
+            $pagepath = __DIR__ . "\..\..\..\data\pages";
+            foreach ($pagelocation as $value) {
+                $pagepath .= "\\" . $value;
+            }
+            array_push($result, $pagepath.".txt");
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Returns pages as array from the conf file
+     * 
+     * @return array<string>
+     */
+    private function getPagesFromConf(): array
+    {
+        $pagesRaw = $this->getConf('targetpages');
+        $pagesArr = explode(',', $pagesRaw);
+        return $pagesArr;
+    }
+
+    /**
+     * Returns groups as array from the conf file
+     * 
+     * @return array<string>
+     */
+    private function getGroupsFromConf(): array
+    {
+        $groupsRaw = $this->getConf('groups');
+        $groupsArr = explode(',', $groupsRaw);
+        return $groupsArr;
+    }
+
+    /**
+     * Get the pages from the POST request
+     * 
+     * @return string
+     */
+    private function getPages(): string
+    {
+        $pages = $this->getPagesFromConf();
+        $result = "";
+        foreach ($pages as $key => $value) {
+            $postpage = $_POST['lpage-'.$value];
+            if($postpage === "on") {
+                $result .= $value.",";
+            }
+        }
+        return substr($result, 0, -1);
+    }
+
+    /**
+     * Get the groups from the POST request
+     * 
+     * @return string
+     */
+    private function getGroups(): string
+    {
+        $groups = $this->getGroupsFromConf();
+        $result = "";
+        foreach ($groups as $key => $value) {
+            $postgroup = $_POST['lgroup-'.$value];
+            if($postgroup === "on") {
+                $result .= $value.",";
+            }
+        }
+        return substr($result, 0, -1);
     }
 }
