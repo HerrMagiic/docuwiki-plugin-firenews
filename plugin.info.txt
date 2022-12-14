@@ -3,5 +3,5 @@ author Nils Schucka
 email  nils@schucka.de
 date   2022-12-03
 name   firenews
-desc   Creates news
+desc   Creates news with an gui on the website
 url    https://www.orizon-surf.de/

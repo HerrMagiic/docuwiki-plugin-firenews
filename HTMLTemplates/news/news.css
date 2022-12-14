@@ -12,18 +12,22 @@
     font-size: 15px;
     font-style: inherit;
     font-weight: bold;
-    text-decoration: underline;
-    color: rgb(8, 45, 176);
+    text-decoration: none;
+    color: #2b73b7;
 }
 .subtitle {
-    font-size: 14px;
+    font-size: 80%;
+    font-style: italic;
+    font-weight: bold;
+    color: #828282;
 }
 .date-author {
     font-size: 12px;
 }
 .news {
+    font-style: italic;
     margin: 0;
-    font-size: 12px;
+    font-size: 80%;
 }
 .div-news {
     margin-top: 4px;

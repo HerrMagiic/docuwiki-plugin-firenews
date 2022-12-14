@@ -11,3 +11,4 @@ $meta['newsAmount']         = array('string');
 $meta['targetpages']        = array('string');
 $meta['groups']             = array('string');
 $meta['referencelink']      = array('string');
+$meta['d_format']           = array('string');

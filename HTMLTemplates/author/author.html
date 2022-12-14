@@ -29,12 +29,12 @@
                 <!--<br>
                 <input type="text" id="ltargetpage" name="ltargetpage" pattern="^[a-zA-Z0-9]+(:[a-zA-Z0-9]+)*$" placeholder="{{firenews_author_targetpage_ph}}" required> -->
                 <div class="targets">
-                    {{GROUP-ELEMENT}}
+                    {{PAGE-ELEMENT}}
                 </div>
             </div>
             <div class="div-reference">
-                <label for="lreferenz">{{firenews_author_reference}}: </label> <br>
-                <input type="text" id="lreferenz" class="lreferenz" name="lreferenz" placeholder="">
+                <label for="lreference">{{firenews_author_reference}}: </label> <br>
+                <input type="text" id="lreference" class="lreference" name="lreference" value="{{reference}}" placeholder="">
             </div>
             
             <div class="container-dates">
@@ -68,7 +68,10 @@
                     <img id="target-icon" class="icon-info" src="/lib/images/info.png">
                     <span class="tooltiptext">{{firenews_author_group_tp}}</span>
                 </div> <br>
-                <input type="text" id="lgroup" name="lgroup" placeholder="{{firenews_author_group_ph}}" pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$">
+                <!-- <input type="text" id="lgroup" name="lgroup" placeholder="{{firenews_author_group_ph}}" pattern="^[a-zA-Z]+(,[a-zA-Z]+)*$"> -->
+                <div class="targets">
+                    {{GROUP-ELEMENT}}
+                </div>
             </div>
             
             <div class="div-sendmails">

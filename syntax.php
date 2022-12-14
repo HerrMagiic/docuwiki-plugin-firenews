@@ -47,9 +47,9 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     public function render($mode, Doku_Renderer $renderer, $data)
     {
         // Variables
-        global $USERINFO, $conf;
+        global $USERINFO;
         
-        $pluginname = "firenews";
+        $pluginname = $this->getPluginName();
         $tablename = $pluginname;
 
         // Connect to database with sqlite plugin
@@ -84,6 +84,9 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // replaces the {{author}} tag with the current user name
                 $formView = str_replace("{{author}}", "{$USERINFO['name']}", $formView);
 
+                // replaces the {{author}} tag with the current user name
+                $formView = str_replace("{{reference}}", "{$this->getConf('referencelink')}", $formView);
+
                 /////////////////////
                 /// Page elements ///
                 /////////////////////
@@ -100,12 +103,25 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     $displayedPages .= $templatePages;
                 }
                 // replaces the {{GROUP-ELEMENT}} tag with the current user name
-                $formView = str_replace("{{GROUP-ELEMENT}}", $displayedPages, $formView);
+                $formView = str_replace("{{PAGE-ELEMENT}}", $displayedPages, $formView);
 
                 //////////////////////
                 /// Group elements ///
                 //////////////////////
+                // get groups from conf
+                $groupArr = $this->getGroupsFromConf();
 
+                // Adds pages to the html file
+                $displayedPages = "";
+                foreach ($groupArr as $key => $value) {
+                    // Gets the html file that will get added to the page
+                    $templatePages = file_get_contents(__DIR__ . "/HTMLTemplates/author/pageandgroupbtn.html");
+                    $templatePages = str_replace("{{pageandgroup}}", 'lgroup-'.$value, $templatePages);
+                    $templatePages = str_replace("{{pageandgroup-value}}", $value, $templatePages);
+                    $displayedPages .= $templatePages;
+                }
+                // replaces the {{GROUP-ELEMENT}} tag with the current user name
+                $formView = str_replace("{{GROUP-ELEMENT}}", $displayedPages, $formView);
 
 
                 // if the form is submitted
@@ -143,18 +159,22 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     }
                     $pages = $this->getPages();
                     $groups = $this->getGroups();
-                    // Send form to database
-                    $sqlite->query("INSERT INTO $tablename ('header', 'subtitle', 'targetpage', 'startdate', 'enddate', 'news', 'group', 'author') 
-                        VALUES ('{$_POST['fheader']}', '{$_POST['lsubtitle']}', '{$pages}', '{$_POST['lstartdate']}', '{$_POST['lenddate']}', '{$_POST['lnews']}', '{$_POST['lgroup']}', '{$_POST['lauthor']}')");
+                    $referencelink = explode("?","{$_POST['lreference']}")[1];
 
+                    // Send form to database
+                    $sqlite->query("BEGIN TRANSACTION");
+                    $sqlite->query("INSERT INTO `$tablename` (`header`, `subtitle`, `targetpage`, `referencelink`, `startdate`, `enddate`, `news`, `group`, `author`) 
+                        VALUES ('{$_POST['fheader']}', '{$_POST['lsubtitle']}', '{$pages}', '{$referencelink}', '{$_POST['lstartdate']}', '{$_POST['lenddate']}', '{$_POST['lnews']}', '{$groups}', '{$_POST['lauthor']}')");
+                    
+                    $sqlite->query("COMMIT");
+                    
                     /**
                      * Send emails to group members if selected
                      * You also need to setup the smtp plugin
                      */
                     if ($_POST['lsendEmails']) {
                         //Find emails of the users that are in the groups given by the POST
-                        $emails = $this->getUsersEmailsOfaGroup($_POST['lgroup']);
-
+                        $emails = $this->getUsersEmailsOfaGroup($groups);
                         $this->sendMailToUsers($emails);
                     }
 
@@ -190,11 +210,13 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 $outputRender = "";
                 // if the form is submitted on save 
                 if (isset($_POST['savesubmit'])) {
+                    $referencelink = explode("?","{$_POST['ereferencelink']}")[1];
                     // Update database
                     $sqlite->query("UPDATE {$tablename} 
                                         SET header = '{$_POST['eheader']}',
                                             subtitle = '{$_POST['esubtitle']}',
                                             targetpage = '{$_POST['etargetpage']}',
+                                            reference = '$referencelink',
                                             startdate = '{$_POST['estartdate']}',
                                             enddate = '{$_POST['eenddate']}',
                                             'news' = '{$_POST['enews']}',
@@ -234,8 +256,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     // Goes through the results and adds them to $outputRender
                     foreach ($result as $value) {
                         $outputRender .= str_replace(
-                            array("{{HEADER}}", "{{SUBTITLE}}", "{{TARGETPAGE}}", "{{STARTDATE}}", "{{ENDDATE}}", "{{NEWS}}", "{{GROUP}}", "{{AUTHOR}}", "{{NEWSID}}"),
-                            array("{$value['header']}", "{$value['subtitle']}", "{$value['targetpage']}", "{$value['startdate']}", "{$value['enddate']}", "{$value['news']}", "{$value['group']}", "{$value['author']}", "{$value['news_id']}"),
+                            ["{{HEADER}}", "{{SUBTITLE}}", "{{TARGETPAGE}}", "{{REFERENCE}}", "{{STARTDATE}}", "{{ENDDATE}}", "{{NEWS}}", "{{GROUP}}", "{{AUTHOR}}", "{{NEWSID}}"],
+                            ["{$value['header']}", "{$value['subtitle']}", "{$value['targetpage']}", "/doku.php?{$value['referencelink']}", "{$value['startdate']}", "{$value['enddate']}", "{$value['news']}", "{$value['group']}", "{$value['author']}", "{$value['news_id']}"],
                             $editnews
                         );
                     }
@@ -262,7 +284,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                                             targetpage LIKE '%,{$data['param']},%' OR
                                             targetpage LIKE '{$data['param']},%'
                                             ORDER BY news_id DESC
-                                            LIMIT 5
+                                            LIMIT {$this->getConf('newsAmount')}
                                     ");
 
             // If the page is found create the news
@@ -270,30 +292,24 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // Gets the news template
                 $newsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/news/news.html");
 
+
                 $outputRender = "";
                 // adds news to the page that was returned by the database
                 foreach ($result as $value) {
 
+
+                    $date = date($this->getConf('d_format'), strtotime($value['startdate']));
+
                     // Check if group is set
                     if(strlen($value['group']) > 0) {
-
                         //Check if only a group can see the message
                         if ($this->isInGroup($value['group']) === false) { continue; }
-
-                        // Replaces the placeholders with the right values
-                        $outputRender .= str_replace(
-                            array("{{HEADER}}", "{{SUBTITLE}}", "{{DATE-AUTHOR}}", "{{NEWS}}"),
-                            array("{$value['header']}", "{$value['subtitle']}", "{$value['startdate']}, {$value['author']}", "{$value['news']}"),
-                            $newsTemplate
-                        );
-
-                        continue;
                     }
 
                     // Replaces the placeholders with the right values
                     $outputRender .= str_replace(
-                        array("{{HEADER}}", "{{SUBTITLE}}", "{{DATE-AUTHOR}}", "{{NEWS}}"),
-                        array("{$value['header']}", "{$value['subtitle']}", "{$value['startdate']}, {$value['author']}", "{$value['news']}"),
+                        ["{{REFERENCE}}", "{{HEADER}}", "{{SUBTITLE}}", "{{DATE-AUTHOR}}", "{{NEWS}}"],
+                        ["/doku.php?{$value['referencelink']}", "{$value['header']}", "{$value['subtitle']}", "{$date}, {$value['author']}", "{$value['news']}"],
                         $newsTemplate
                     );
                 }
@@ -402,13 +418,14 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     private function isInGroup(string $groups): bool 
     {
         global $INFO;
-        $groupArr[] = explode(",", $groups);
+        $groupArr = explode(",", $groups);
 
         // Ignores everything if the user is a admin or manager
-        if($INFO['isadmin'] || $INFO['ismanager'] ) { return true; }
+        if ($INFO['isadmin'] || $INFO['ismanager'] ) { return true; }
         
         foreach($groupArr as $value) {
-            if(in_array($value, $INFO['userinfo']['grps'])) { return true; }
+            if ($INFO['userinfo']['grps'] == null) { return false; };
+            if (in_array($value, $INFO['userinfo']['grps'])) { return true; }
         }
 
         return false;
@@ -445,7 +462,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
      */
     private function writeToPage(string $path, string $input, bool $nocache) 
     {
-        echo $path;
         // Writes the tag into the targetpage
         $fileStream = fopen($path, 'a');
 
@@ -539,5 +555,66 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
             }
         }
         return substr($result, 0, -1);
+    }
+    /**
+     * askjlksakjfdasdf
+     * @param string $date format needs to be ('YYYY-MM-DD')
+     * 
+     */
+    private function getFormatedDate(string $date): string
+    {
+        global $conf;
+        $month = explode("-",  $date)[1];
+        $fulldate = "";
+        if ($conf['lang'] === "de") {
+            switch ($month) {
+                case 1:
+                    $fulldate = "Jan";
+                    break;
+                case 2:
+                    $fulldate = "Feb";
+                    break;
+                case 3:
+                    $fulldate = "Mrz";
+                    break;
+                case 4:
+                    $fulldate = "Apr";
+                    break;
+                case 5:
+                    $fulldate = "Mai";
+                    break;
+                case 6:
+                    $fulldate = "Jun";
+                    break;
+                case 7:
+                    $fulldate = "Jul";
+                    break;
+                case 8:
+                    $fulldate = "Aug";
+                    break;
+                case 9:
+                    $fulldate = "Sep";
+                    break;
+                case 10:
+                    $fulldate = "Okt";
+                    break;
+                case 11:
+                    $fulldate = "Nov";
+                    break;
+                case 12:
+                    $fulldate = "Dez";
+                    break;
+                default:
+                    
+                    break;
+            }
+        } else {
+
+        }
+        
+        
+
+        return "";
+        
     }
 }
