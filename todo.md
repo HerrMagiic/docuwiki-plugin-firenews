@@ -9,6 +9,8 @@
 - [x] alle gruppen listen mit checkbox
 - [x] seiten mit checkbox und in config reinschreiben welche seiten
 - [ ] site with all news
+- [ ] can everyone see the news in allnews also people that arent in the group?
+
 
 #### Config ideas:
 - [x] number of news on one page

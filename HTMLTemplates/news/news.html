@@ -1,8 +1,10 @@
 <link href="./lib/plugins/firenews/HTMLTemplates/news/news.css" type="text/css" rel="stylesheet" />
-<div class="container-news">
-    <a href="{{REFERENCE}}" class="header">{{HEADER}}</a> <br>
+<div class='container-news'>
+    <div class="header-author">
+        <a href="{{REFERENCE}}" class="header">{{HEADER}}</a> 
+        <a class="date-author">({{DATE-AUTHOR}})</a>
+    </div>
     <a class="subtitle">{{SUBTITLE}}</a> <br>
-    <a class="date-author">({{DATE-AUTHOR}})</a> <br>
     <div class="div-news">
         <a class="news">{{NEWS}}</a>
     </div>

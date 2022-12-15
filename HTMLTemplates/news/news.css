@@ -2,7 +2,6 @@
     display: block;
     word-wrap: break-word;
     width: 220px;
-    border-bottom: 1px solid black;
     padding: 5px;
     border-radius: 3px;
     margin-left: auto; 
@@ -22,13 +21,15 @@
     color: #828282;
 }
 .date-author {
-    font-size: 12px;
+    font-size: 70%;
+    font-style: italic;
+    color: #828282 !important;
+    float: right !important;
+    margin-left: 1em;
+    margin-top: 0.4em;
 }
 .news {
     font-style: italic;
     margin: 0;
     font-size: 80%;
-}
-.div-news {
-    margin-top: 4px;
 }

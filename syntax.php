@@ -33,6 +33,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         // add the found string into an array with the key 'param'
         $datatest_conf              = array();
         $datatest_conf['param']     = $params;
+        
 
         // I think this is useless 
         if (!$params) {
@@ -70,7 +71,9 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     'author' TEXT
                 )");
 
-
+        if (in_array("allnews", $this->getPagesFromConf())) {
+            throw new Exception("The targetpages 'allnews' cant be set in the config");
+        }
         // Checks if mode is xhtml
         if ($mode === 'xhtml') {
             // When param matches creates the Author template on the page
@@ -268,8 +271,41 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // Appens the html to the page
                 $renderer->doc .= $formView;
                 return true;
-            }
+            } else if ($data['param'] === "allnews") {
+                // Gets the news with the right page
+                $result = $sqlite->query("SELECT * FROM {$tablename}
+                                                ORDER BY news_id DESC
+                                        ");
 
+                // If the page is found create the news
+                if ($result != NULL || $result != false) {
+                    // Gets the news template
+                    $newsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/news/news.html");
+
+
+                    $outputRender = "";
+                    // adds news to the page that was returned by the database
+                    foreach ($result as $value) {
+
+                        $date = date($this->getConf('d_format'), strtotime($value['startdate']));
+
+                        // Check if group is set
+                        // if(strlen($value['group']) > 0) {
+                        //     //Check if only a group can see the message
+                        //     if ($this->isInGroup($value['group']) === false) { continue; }
+                        // }
+
+                        // Replaces the placeholders with the right values
+                        $outputRender .= str_replace(
+                            ["<div class='container-news'>", "{{REFERENCE}}", "{{HEADER}}", "{{SUBTITLE}}", "{{DATE-AUTHOR}}", "{{NEWS}}"],
+                            ["<div class='container-news' style='width: auto; !important'>", "/doku.php?{$value['referencelink']}", "{$value['header']}", "{$value['subtitle']}", "{$date}, {$value['author']}", "{$value['news']}"],
+                            $newsTemplate);
+                    }
+                    // Puts the html to the page
+                    $renderer->doc .= $outputRender;
+                }
+                return true;
+            }
             /////////////////////////////////////////////////
             /// This part adds the news to the right page ///
             /////////////////////////////////////////////////
@@ -506,6 +542,8 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     {
         $pagesRaw = $this->getConf('targetpages');
         $pagesArr = explode(',', $pagesRaw);
+        
+
         return $pagesArr;
     }
 
@@ -555,66 +593,5 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
             }
         }
         return substr($result, 0, -1);
-    }
-    /**
-     * askjlksakjfdasdf
-     * @param string $date format needs to be ('YYYY-MM-DD')
-     * 
-     */
-    private function getFormatedDate(string $date): string
-    {
-        global $conf;
-        $month = explode("-",  $date)[1];
-        $fulldate = "";
-        if ($conf['lang'] === "de") {
-            switch ($month) {
-                case 1:
-                    $fulldate = "Jan";
-                    break;
-                case 2:
-                    $fulldate = "Feb";
-                    break;
-                case 3:
-                    $fulldate = "Mrz";
-                    break;
-                case 4:
-                    $fulldate = "Apr";
-                    break;
-                case 5:
-                    $fulldate = "Mai";
-                    break;
-                case 6:
-                    $fulldate = "Jun";
-                    break;
-                case 7:
-                    $fulldate = "Jul";
-                    break;
-                case 8:
-                    $fulldate = "Aug";
-                    break;
-                case 9:
-                    $fulldate = "Sep";
-                    break;
-                case 10:
-                    $fulldate = "Okt";
-                    break;
-                case 11:
-                    $fulldate = "Nov";
-                    break;
-                case 12:
-                    $fulldate = "Dez";
-                    break;
-                default:
-                    
-                    break;
-            }
-        } else {
-
-        }
-        
-        
-
-        return "";
-        
     }
 }
