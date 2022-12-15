@@ -5,7 +5,7 @@
  * @author NilsSchucka <nils@schucka.de>
  */
 
-// Author /HTMLTemplates/author/author.html
+// Author /templates/author/author.html
 $lang['firenews_author_header']             = 'Header';
 $lang['firenews_author_subtitle']           = 'Subtitle';
 $lang['firenews_author_targetpage']         = 'Target Page';
@@ -27,7 +27,7 @@ $lang['firenews_author_preview']            = 'Preview';
 $lang['firenews_author_message_info']       = 'News Created!';
 $lang['firenews_author_message_error']      = 'The page doesn\'t exists!';
 
-//Edit News /HTMLTemplates/editnews/
+//Edit News /templates/editnews/
 $lang['firenews_editnews_save']             = 'Save';
 $lang['firenews_editnews_delete']           = 'Delete';
 $lang['firenews_editnews_header']           = 'Edit News';

@@ -78,9 +78,9 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         if ($mode === 'xhtml') {
             // When param matches creates the Author template on the page
             if ($data['param'] === "author") {
-
+                
                 // Gets the html file that will get added to the page
-                $formView = file_get_contents(__DIR__ . "/HTMLTemplates/author/author.html");
+                $formView = file_get_contents(__DIR__ . "/templates/author/author.html");
                 // Applies the correct language from the lang/language
                 $formView = $this->setLanguage($formView, "/\{\{firenews\_(\w+)\}\}/");
 
@@ -100,7 +100,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 $displayedPages = "";
                 foreach ($pagesArr as $key => $value) {
                     // Gets the html file that will get added to the page
-                    $templatePages = file_get_contents(__DIR__ . "/HTMLTemplates/author/pageandgroupbtn.html");
+                    $templatePages = file_get_contents(__DIR__ . "/templates/author/pageandgroupbtn.html");
                     $templatePages = str_replace("{{pageandgroup}}", 'lpage-'.$value, $templatePages);
                     $templatePages = str_replace("{{pageandgroup-value}}", $value, $templatePages);
                     $displayedPages .= $templatePages;
@@ -118,7 +118,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 $displayedPages = "";
                 foreach ($groupArr as $key => $value) {
                     // Gets the html file that will get added to the page
-                    $templatePages = file_get_contents(__DIR__ . "/HTMLTemplates/author/pageandgroupbtn.html");
+                    $templatePages = file_get_contents(__DIR__ . "/templates/author/pageandgroupbtn.html");
                     $templatePages = str_replace("{{pageandgroup}}", 'lgroup-'.$value, $templatePages);
                     $templatePages = str_replace("{{pageandgroup-value}}", $value, $templatePages);
                     $displayedPages .= $templatePages;
@@ -202,11 +202,11 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
             } else if ($data['param'] === "editnews") {
 
                 // Creating the edit news Page
-                $editnewsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/editnews/editnewsTemplate.html");
+                $editnewsTemplate = file_get_contents(__DIR__ . "/templates/editnews/editnewsTemplate.html");
                 // Applies the correct language from the lang/language
                 $editnewsTemplate = $this->setLanguage($editnewsTemplate, "/\{\{firenews\_(\w+)\}\}/");
 
-                $editnews = file_get_contents(__DIR__ . "/HTMLTemplates/editnews/editnews.html");
+                $editnews = file_get_contents(__DIR__ . "/templates/editnews/editnews.html");
                 // Applies the correct language from the lang/language
                 $editnews = $this->setLanguage($editnews, "/\{\{firenews\_(\w+)\}\}/");
                 
@@ -215,7 +215,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 if (isset($_POST['savesubmit'])) {
                     $referencelink = explode("?","{$_POST['ereferencelink']}")[1];
                     // Update database
-                    $sqlite->query("UPDATE {$tablename} 
+                    $sqlite->query("UPDATE {$tablename}
                                         SET header = '{$_POST['eheader']}',
                                             subtitle = '{$_POST['esubtitle']}',
                                             targetpage = '{$_POST['etargetpage']}',
@@ -280,7 +280,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // If the page is found create the news
                 if ($result != NULL || $result != false) {
                     // Gets the news template
-                    $newsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/news/news.html");
+                    $newsTemplate = file_get_contents(__DIR__ . "/templates/news/news.html");
 
 
                     $outputRender = "";
@@ -326,7 +326,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
             // If the page is found create the news
             if ($result != NULL || $result != false) {
                 // Gets the news template
-                $newsTemplate = file_get_contents(__DIR__ . "/HTMLTemplates/news/news.html");
+                $newsTemplate = file_get_contents(__DIR__ . "/templates/news/news.html");
 
 
                 $outputRender = "";
