@@ -11,14 +11,13 @@
 
 .container-template {
     padding: 0.5rem;
-    /* border:2px solid black; */
+    width: min-content;
     border-radius: 2px;
     width: auto;
 }
-
-/* .container-buttons {
-  display: flex;
-} */
+.div-targetpage {
+  width: min-content;
+}
 
 div input {
     margin-top: 5px;
@@ -60,18 +59,9 @@ input[type=submit]:hover {
 /* Customize the label (the container) */
 .checkbox-label {
   display: flex;
-  /* display: block;
-  position: relative;
-  margin-top: 4px;
-  padding-left: 35px;
-  margin-bottom: 12px; */
   cursor: pointer;
   font-size: 22px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
-  /* padding-bottom: 10px; */
 }
 
 /* Hide the browser's default checkbox */
@@ -87,9 +77,9 @@ input[type=submit]:hover {
 .checkmark {
   display: block;
   position: relative;
-  height: 25px;
-  width: 25px;
-  border-radius: 1px;
+  height: 23px;
+  width: 23px;
+  border-radius: 0.5px;
   background-color: rgb(197, 196, 196);
 }
 
@@ -117,8 +107,8 @@ input[type=submit]:hover {
 
 /* Style the checkmark/indicator */
 .checkbox-label .checkmark:after {
-  left: 9px;
-  top: 5px;
+  left: 7.5px;
+  top: 3.6px;
   width: 5px;
   height: 10px;
   border: solid white;
@@ -137,7 +127,6 @@ input[type=submit]:hover {
   display: inline-block;
   cursor: pointer;
   padding-bottom: 0;
-  /* border-bottom: 1px dotted black; */
 }
 
 .tooltip .tooltiptext {
@@ -148,7 +137,6 @@ input[type=submit]:hover {
   text-align: center;
   border-radius: 3px;
   padding: 5px;
-  /* padding: 5px 0; */
   font-size: 12px;
   
   /* Position the tooltip */
@@ -223,27 +211,27 @@ input[type=submit]:hover {
   margin-left: auto; 
   margin-right: 0;
 }
-.container-pageandgroup {
-  display: block;
-  text-align: center;
-  
-  margin-right: 14px;
-  
-}
 .pagegroupname {
-  display: block;
   font-weight: bold;
-  text-align: center;
-  line-height: 150%;
   font-size: 14px;
-}
-.pagegroup {
-  position: relative;
-  display: flex;
-  justify-content: center;
+  inline-size: 65px;
+  text-align: center;
+  overflow-wrap: break-word;
+  line-height: 1;
+  cursor: default;
 }
 .targets {
   display: flex;
-  margin: 5px;
-  margin-right: 5px;
+  width: 350px;
+  flex-wrap: wrap;
+}
+.container-label-pagegroup {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 0.2rem;
+  
+}
+.container-label-checkbox {
+  display: flex;
+  justify-content: center;
 }

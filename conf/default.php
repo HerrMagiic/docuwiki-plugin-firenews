@@ -7,6 +7,6 @@
 
 $conf['d_format']       = 'd. M Y';
 $conf['newsAmount']     = "5";
-$conf['targetpages']    = 'test5,test';
-$conf['groups']         = 'brand,user,admin,test';
+$conf['targetpages']    = 'test5,test,longtest,news';
+$conf['groups']         = 'brand,user,admin';
 $conf['referencelink']  = '/doku.php?id=allnews';

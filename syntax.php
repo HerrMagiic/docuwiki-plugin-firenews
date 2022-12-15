@@ -34,8 +34,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         $datatest_conf              = array();
         $datatest_conf['param']     = $params;
         
-
-        // I think this is useless 
         if (!$params) {
             msg('Syntax detected but unknown parameter was attached.', -1);
         } else {
@@ -129,16 +127,18 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
 
                 // if the form is submitted
                 if (isset($_POST["submitted"])) {
-
                     /**
                      * Adds a {{firenews>}} tag to the targetpage if not exists
                      * And adds the submitted information in the database
                      */
+                    $pages = $this->getPages();
+                    $groups = $this->getGroups();
                     // Explodes the string to get the targetpage Path
-                    $pagePaths = $this->returnPagePaths($pagesArr);
-                    
+                    $pagePaths = $this->returnPagePaths(explode(',', $pages));
+
                     // If file don't exists return false and add a error message
                     foreach ($pagePaths as $key => $value) {
+                        
                         if (!file_exists($value)) {
                             $formView = str_replace("{{ script_placeholder }}", 
                             <<<HTML
@@ -150,6 +150,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     
                             // This adds the html to the page
                             $renderer->doc .= $formView;
+                            
                             return false;
                         } 
                     }
@@ -160,8 +161,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                         $pagename = str_replace(".txt", "", end(explode("\\", $value)));
                         $this->writeToPage($value, "{{firenews>{$pagename}}}", true);
                     }
-                    $pages = $this->getPages();
-                    $groups = $this->getGroups();
+                    
                     $referencelink = explode("?","{$_POST['lreference']}")[1];
 
                     // Send form to database
@@ -282,7 +282,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     // Gets the news template
                     $newsTemplate = file_get_contents(__DIR__ . "/templates/news/news.html");
 
-
                     $outputRender = "";
                     // adds news to the page that was returned by the database
                     foreach ($result as $value) {
@@ -328,7 +327,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 // Gets the news template
                 $newsTemplate = file_get_contents(__DIR__ . "/templates/news/news.html");
 
-
                 $outputRender = "";
                 // adds news to the page that was returned by the database
                 foreach ($result as $value) {
@@ -355,6 +353,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 return true;
             }
         }
+
         return false;
     }
 
@@ -425,6 +424,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 }
             }
         }
+
         return $listOfEmails;
     }
 
@@ -487,6 +487,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                     return $lang;
                 },
                 $file );
+        
         return $result;
     }
 
@@ -503,11 +504,12 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
 
         if (!strpos(file_get_contents($path), $input)) {
             if($nocache && !strpos(file_get_contents($path), "~~NOCACHE~~")) {
-                fwrite($fileStream, "~~NOCACHE~~\\\\".$input);
+                fwrite($fileStream, "~~NOCACHE~~");
+                $fileStream = fopen($path, 'a');
+                fwrite($fileStream, $input);
             } else {
                 fwrite($fileStream, $input);
             }
-            
         }
     }
 
@@ -543,7 +545,6 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
         $pagesRaw = $this->getConf('targetpages');
         $pagesArr = explode(',', $pagesRaw);
         
-
         return $pagesArr;
     }
 
@@ -556,6 +557,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
     {
         $groupsRaw = $this->getConf('groups');
         $groupsArr = explode(',', $groupsRaw);
+
         return $groupsArr;
     }
 
@@ -574,6 +576,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 $result .= $value.",";
             }
         }
+
         return substr($result, 0, -1);
     }
 
@@ -592,6 +595,7 @@ class syntax_plugin_firenews extends \dokuwiki\Extension\SyntaxPlugin
                 $result .= $value.",";
             }
         }
+
         return substr($result, 0, -1);
     }
 }
